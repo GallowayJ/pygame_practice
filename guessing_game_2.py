@@ -1,7 +1,7 @@
 import random
 import sys
-
-guesses_taken = 0
+import pandas as pd
+import datetime
 
 
 def print_welcome():
@@ -31,20 +31,20 @@ def get_diff():
         raise
 
     if selected_diff in (int(1), list_of_diff[0]):
-        selected_diff, upper_num, guesses = list_of_diff[0], 15, 6
+        selected_diff, upper_num, guesses_start = list_of_diff[0], 15, 6
         print("You've selected {}, AKA 'bitch-level'".format(selected_diff))
 
     elif selected_diff in (int(2), list_of_diff[1]):
-        selected_diff, upper_num, guesses = list_of_diff[1], 20, 4
+        selected_diff, upper_num, guesses_start = list_of_diff[1], 20, 4
         print("You've selected {}.\
               Gunning for mediocrity!".format(selected_diff))
 
     elif selected_diff in (int(3), list_of_diff[2]):
-        selected_diff, upper_num, guesses = list_of_diff[2], 35, 3
+        selected_diff, upper_num, guesses_start = list_of_diff[2], 35, 3
         print("{}. Look's like someone's cocky..".format(selected_diff))
     else:
         print("I didn't quite get that...")
-    return selected_diff, upper_num, guesses
+    return selected_diff, upper_num, guesses_start
 
 
 def get_player_name():
@@ -54,7 +54,7 @@ def get_player_name():
 
 def print_instruct(upper_num):
     print("I've chosen a random integer between 0 and {}.".format(upper_num))
-    print("You have {} attempts to guess this number.".format(guesses))
+    print("You have {} attempts to guess this number.".format(guesses_start))
     return
 
 
@@ -64,31 +64,65 @@ def gen_random_number(upper_num):
     return jackpot_number
 
 
-def play_game(guesses, jackpot_number):
-    guesses = guesses
+def play_game(guesses_start, jackpot_number, name, diff, upper_num):
+    guesses_left = guesses_start
     jackpot_number = jackpot_number
-    print("You have {} guesses. Good luck!".format(guesses))
+    print("You have {} guesses. Good luck!".format(guesses_left))
     while True:
         this_guess = int(input("Type a number:"))
-        guesses -= 1
+        guesses_left -= 1
         if this_guess is jackpot_number:
             print("You win")
+            guesses_taken = guesses_start - guesses_left
+            score = scoring(upper_num, guesses_left)
+            record_keeping(name, diff, guesses_taken, score)
             break
-        elif guesses is not 0:
+        elif guesses_left is not 0:
             if this_guess < jackpot_number:
-                print("Too low, mofo. Only {} left!".format(guesses))
+                print("Too low, mofo. Only {} left!".format(guesses_left))
             if this_guess > jackpot_number:
-                print("Too high, my girlguy. Only {} left!".format(guesses))
+                print("Too high, my guy. Only {} left!".format(guesses_left))
         else:
             print("You lose")
             break
     return
 
+
+def scoring(upper_num, guesses):
+    score = upper_num * guesses
+    print("Not bad, you scored {} points!!!".format(score))
+    return score
+
+
+def record_keeping(name, diff, guesses_taken, score):
+    """Fix this later"""
+    current_time = datetime.datetime.now()
+    record_dict = {'Time': current_time, 'Player': name, 'Difficulty': diff,
+                   'Guesses taken': guesses_taken, 'Score': score}
+    current_game_df = pd.DataFrame.from_dict([record_dict])
+    try:
+        records_csv = pd.read_csv('records.csv')
+        records_csv = pd.concat([records_csv, current_game_df],
+                                ignore_index=True)
+        records_csv.to_csv('records.csv')
+        print(records_csv, "index is:", records_csv.index)
+    except OSError:
+        records_csv = current_game_df
+        records_csv.to_csv('records.csv')
+        print(records_csv)
+    except:
+        print("Woah, something went wrong with record keeping")
+        raise
+
+
 print("Oh hello there, would you like to play with me?")
 print_welcome()
-diff, upper_num, guesses = get_diff()
+diff, upper_num, guesses_start = get_diff()
 name = get_player_name()
 jackpot_number = gen_random_number(upper_num)
 print_instruct(upper_num)
-play_game(guesses, jackpot_number)
+print("debug:", guesses_start, jackpot_number, name, diff, upper_num)
+play_game(guesses_start, jackpot_number, name, diff, upper_num)
+
+
 sys.exit()
