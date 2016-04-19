@@ -65,17 +65,17 @@ def main():
 
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
-    pygame.display.set_icon(pygame.image.load('C:\\Users\\Jason\\Documents\\GitHub\\Pygame practice\\gameicon.png'))
+    pygame.display.set_icon(pygame.image.load('gameicon.png'))
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
     pygame.display.set_caption('Squirrel Eat Squirrel')
     BASICFONT = pygame.font.Font('freesansbold.ttf', 32)
 
     # load the image files
-    L_SQUIR_IMG = pygame.image.load('C:\\Users\\Jason\\Documents\\GitHub\\Pygame practice\\pixelpenis.png')
+    L_SQUIR_IMG = pygame.image.load('pixelpenis.png')
     R_SQUIR_IMG = pygame.transform.flip(L_SQUIR_IMG, True, False)
     GRASSIMAGES = []
     for i in range(1, 5):
-        GRASSIMAGES.append(pygame.image.load('C:\\Users\\Jason\\Documents\\GitHub\\Pygame practice\\grass%s.png' % i))
+        GRASSIMAGES.append(pygame.image.load('grass%s.png' % i))
 
     while True:
         runGame()
