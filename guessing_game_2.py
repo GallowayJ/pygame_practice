@@ -95,21 +95,20 @@ def scoring(upper_num, guesses):
 
 
 def record_keeping(name, diff, guesses_taken, score):
-    """Fix this later"""
+    """Round the time, sort the dataframe by score then diff"""
     current_time = datetime.datetime.now()
-    record_dict = {'Time': current_time, 'Player': name, 'Difficulty': diff,
-                   'Guesses taken': guesses_taken, 'Score': score}
-    current_game_df = pd.DataFrame.from_dict([record_dict])
+    cols = ['Time', 'Player', 'Difficulty', 'Guesses taken', 'Score']
+    data = [current_time, name, diff, guesses_taken, score]
+    current_game_df = pd.DataFrame(data=[data], columns=cols)
     try:
         records_csv = pd.read_csv('records.csv')
         records_csv = pd.concat([records_csv, current_game_df],
                                 ignore_index=True)
-        records_csv.to_csv('records.csv')
+        records_csv.to_csv('records.csv', index=False)
         print(records_csv, "index is:", records_csv.index)
     except OSError:
-        records_csv = current_game_df
-        records_csv.to_csv('records.csv')
-        print(records_csv)
+        current_game_df.to_csv('records.csv', index=False)
+        print(current_game_df)
     except:
         print("Woah, something went wrong with record keeping")
         raise
@@ -121,8 +120,5 @@ diff, upper_num, guesses_start = get_diff()
 name = get_player_name()
 jackpot_number = gen_random_number(upper_num)
 print_instruct(upper_num)
-print("debug:", guesses_start, jackpot_number, name, diff, upper_num)
 play_game(guesses_start, jackpot_number, name, diff, upper_num)
-
-
 sys.exit()
